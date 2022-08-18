@@ -19,6 +19,23 @@ async function main() {
     lendingPool,
     deployer
   );
+  const daiPrice = await getDaiPrice();
+  const amountDaiToBorrow =
+    availableBorrowsETH.toString() * 0.95 * (1 / daiPrice.toNumber());
+  console.log(`You can borrow ${amountDaiToBorrow} DAI`);
+  const amountDaiToBorrowWei = ethers.utils.parseEther(
+    amountDaiToBorrow.toString()
+  );
+}
+
+async function getDaiPrice() {
+  const daiEthPriceFeed = await ethers.getContractAt(
+    "AggregatorV3Interface",
+    "0x773616E4d11A78F511299002da57A0a94577F1f4" // again we are taking the mainnet address for dai/eth.
+  );
+  const price = (await daiEthPriceFeed.latestRoundData())[1];
+  console.log(`The DAI/ETH price is ${price.toString()}`);
+  return price;
 }
 
 async function getBorrowUserData(lendingPool, account) {
